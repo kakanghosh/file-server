@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"time"
 	"io/ioutil"
 	"os"
 )
@@ -49,27 +47,10 @@ func deleteFile(context *gin.Context) {
 
 func main() {
 	
-	router := gin.New()
+	router := gin.Default()
 
-	router.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s\" \"%s\" \"%s\"\n",
-				param.ClientIP,
-				param.TimeStamp.Format(time.RFC1123),
-				param.Method,
-				param.Path,
-				param.Request.Proto,
-				param.StatusCode,
-				param.Latency,
-				param.Request.UserAgent(),
-				param.ErrorMessage,
-		)
-	}))
+	router.MaxMultipartMemory = 8 << 25
 
-	router.Use(gin.Recovery())
-
-	router.MaxMultipartMemory = 8 << 20
-
-	//router.StaticFS("/assets", http.Dir(STATIC_FILES_PATH))
 	router.LoadHTMLGlob("templates/*")
 
 	router.GET("/index", indexPage)
