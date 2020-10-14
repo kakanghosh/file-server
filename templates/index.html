@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Server</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h2> {{ .title }} </h2>
+                        <form action="upload-file" method="POST" enctype="multipart/form-data">
+                            <div class="form-row">
+                                <div class="input-group mb-3">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="file" id="inputGroupFile02">
+                                        <label class="custom-file-label" for="inputGroupFile02">Choose file</label>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="submit">Upload</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div>
+                    {{ range .files }}
+                    <ul>
+                        <li>
+                            <a href="/static-files/{{ .Name }}">{{ .Name }}</a> 
+                            - {{ .Size }} 
+                            - {{ .ModTime }}
+                            <a href="/static-files/{{ .Name }}/delete">X</a>
+                        </li>
+                    </ul>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
