@@ -9,6 +9,11 @@ import (
 )
 
 const STATIC_FILES_PATH = "/home/ghosh/Desktop/static-files"
+const HOME 			 	= "/"
+const INDEX			 	= "/index"
+const UPLOAD_FILES   	= "/upload-file"
+const DOWNLOAD_FILES 	= "/static-files/:fileName"
+const DELETE_FILES   	= "/static-files/delete"
 
 func uploadFile(context *gin.Context) {
 	multipartForm, _ := context.MultipartForm()
@@ -16,7 +21,7 @@ func uploadFile(context *gin.Context) {
 	for _, file := range files {
 		context.SaveUploadedFile(file, STATIC_FILES_PATH + "/" + file.Filename)
 	}
-	context.Redirect(http.StatusMovedPermanently, "/index")
+	context.Redirect(http.StatusMovedPermanently, INDEX)
 }
 
 func indexPage(context *gin.Context) {
@@ -41,7 +46,11 @@ func deleteFile(context *gin.Context) {
 	if err != nil {
 		log.Println("Failed to delete"+err.Error())
 	}
-	context.Redirect(http.StatusMovedPermanently, "/index")
+	context.Redirect(http.StatusMovedPermanently, INDEX)
+}
+
+func redirectToIndexPage(context *gin.Context) {
+	context.Redirect(http.StatusMovedPermanently, INDEX)
 }
 
 func main() {
@@ -53,13 +62,17 @@ func main() {
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/assets", "./assets")
 
-	router.GET("/", func(context *gin.Context) {
-		context.Redirect(http.StatusMovedPermanently, "/index")
-	})
-	router.GET("/index", indexPage)
-	router.POST("/upload-file", uploadFile)
-	router.GET("/static-files/:fileName", downloadFile)
-	router.POST("/static-files/delete", deleteFile)
+	authorized := router.Group("", gin.BasicAuth(gin.Accounts{
+		"kakanghosh@gmail.com":  "bar",
+		"agomonghosh@gmail.com": "1234",
+		"chandanghosh": "12345",
+	}))
+
+	authorized.GET(HOME, redirectToIndexPage)
+	authorized.GET(INDEX, indexPage)
+	authorized.POST(UPLOAD_FILES, uploadFile)
+	authorized.GET(DOWNLOAD_FILES, downloadFile)
+	authorized.POST(DELETE_FILES, deleteFile)
 
 	router.Run()
 }
