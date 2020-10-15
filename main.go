@@ -8,7 +8,11 @@ import (
 	"os"
 )
 
-const STATIC_FILES_PATH = "/home/ghosh/Desktop/static-files"
+//"/home/ghosh/Desktop/static-files"
+var STATIC_FILES_PATH 	= os.Getenv("STATIC_FILE_PATH")
+var USER_NAME			= os.Getenv("USER_NAME")
+var PASSWORD			= os.Getenv("PASSWORD")
+
 const HOME 			 	= "/"
 const INDEX			 	= "/index"
 const UPLOAD_FILES   	= "/upload-file"
@@ -62,11 +66,7 @@ func main() {
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/assets", "./assets")
 
-	authorized := router.Group("", gin.BasicAuth(gin.Accounts{
-		"kakanghosh@gmail.com":  "bar",
-		"agomonghosh@gmail.com": "1234",
-		"chandanghosh": "12345",
-	}))
+	authorized := router.Group("", gin.BasicAuth(gin.Accounts{USER_NAME: PASSWORD}))
 
 	authorized.GET(HOME, redirectToIndexPage)
 	authorized.GET(INDEX, indexPage)
