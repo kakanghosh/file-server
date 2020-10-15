@@ -1,0 +1,20 @@
+.ui.grid {
+    margin-top: 2%;
+}
+
+.ui.cards, .content-table {
+    padding-left:  2%;
+    padding-right: 2%;
+}
+
+.content-table {
+    margin-top: 2%;  
+}
+
+.ui.card, .ui.cards>.card {
+    width: 100%;
+}
+
+.negative.ui.button > a {
+    color: #e7ebef;
+}

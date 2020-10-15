@@ -4,45 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Server</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <link rel="icon" href="/assets/images/favicon.png" type="image/gif" sizes="16x16">
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <script src="/assets/js/main.js" defer></script>
 </head>
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col">
+
+    <div class="ui grid">
+        <div class="sixteen wide column">
+            <div class="ui cards">
                 <div class="card">
-                    <div class="card-body">
-                        <h2> {{ .title }} </h2>
-                        <form action="upload-file" method="POST" enctype="multipart/form-data">
-                            <div class="form-row">
-                                <div class="input-group mb-3">
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" name="file" id="inputGroupFile02">
-                                        <label class="custom-file-label" for="inputGroupFile02">Choose file</label>
-                                    </div>
-                                    <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="submit">Upload</button>
-                                    </div>
-                                </div>
+                  <div class="content">
+                    <div class="description">
+                        <form action="upload-file" id="files-upload-form" method="POST" enctype="multipart/form-data" class="ui form success">
+                            <div class="field">
+                              <h2>{{.title}}</h2>
+                              <input type="file" name="files[]" multiple accept=".zip">
                             </div>
+                            <button type="submit" id="submit-button" class="ui button" disabled><i class="upload icon"></i></button>
                         </form>
                     </div>
-                </div>
-
-                <div>
-                    {{ range .files }}
-                    <ul>
-                        <li>
-                            <a href="/static-files/{{ .Name }}">{{ .Name }}</a> 
-                            - {{ .Size }} 
-                            - {{ .ModTime }}
-                            <a href="/static-files/{{ .Name }}/delete">X</a>
-                        </li>
-                    </ul>
-                    {{ end }}
+                  </div>
                 </div>
             </div>
         </div>
+        <div class="sixteen wide column">
+            <div class="content-table">
+                <table class="ui celled striped table">
+                    <thead>
+                        <tr>
+                          <th>File Name</th>
+                          <th>File Size</th>
+                          <th>Last Modification</th>
+                          <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ range .files }}
+                        <tr>
+                            <td class="collapsing">
+                                <i class="download icon"></i>
+                                <a href="/static-files/{{ .Name }}">{{ .Name }}</a>
+                            </td>
+                            <td>{{ .Size }} Bytes</td>
+                            <td>{{ .ModTime }}</td>
+                            <td>
+                                <form action="/static-files/delete" method="POST">
+                                    <input type="hidden" name="file" value="{{.Name}}"/>
+                                    <button type="submit" class="negative ui button">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {{ end }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
+    
 </body>
 </html>
