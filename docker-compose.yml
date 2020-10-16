@@ -1,0 +1,11 @@
+version: "3.3"
+services:
+  web:
+    image: ghoshdocker/file-server:v2.0.0
+    environment:
+        - USER_NAME=ghosh
+        - PASSWORD=ghosh
+        - STATIC_FILE_PATH=/app/static-files
+        - GIN_MODE=release
+    ports:
+        - 8000:8080
