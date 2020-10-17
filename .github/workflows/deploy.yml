@@ -16,8 +16,3 @@ jobs:
           heroku_app_name: "ghosh-file-server" #Must be unique in Heroku
           heroku_email: "kakanghosh69@gmail.com"
           usedocker: true
-        env:
-          USER_NAME: ${{ secrets.FILE_SERVER_USER_NAME }}
-          PASSWORD: ${{ secrets.FILE_SERVER_PASSWORD }}
-          GIN_MODE: release
-          STATIC_FILE_PATH: /app/static-files
