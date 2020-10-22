@@ -26,7 +26,7 @@ const (
 
 const (
 	templateFolder = "templates/*"
-	assetsFolder   = "./assets"
+	assetsFolder   = "assets/"
 )
 
 func uploadFile(context *gin.Context) {
