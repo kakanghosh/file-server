@@ -2,34 +2,47 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"io/ioutil"
 	"os"
 )
 
 //"/home/ghosh/Desktop/static-files"
-var STATIC_FILES_PATH 	= os.Getenv("STATIC_FILE_PATH")
-var USER_NAME			= os.Getenv("USER_NAME")
-var PASSWORD			= os.Getenv("PASSWORD")
+var (
+	staticFilesPath = os.Getenv("STATIC_FILE_PATH")
+	userName        = os.Getenv("USER_NAME")
+	password        = os.Getenv("PASSWORD")
+)
 
-const HOME 			 	= "/"
-const INDEX			 	= "/index"
-const UPLOAD_FILES   	= "/upload-file"
-const DOWNLOAD_FILES 	= "/static-files/:fileName"
-const DELETE_FILES   	= "/static-files/delete"
+const (
+	home          = "/"
+	index         = "/index"
+	uploadFiles   = "/upload-file"
+	downloadFiles = "/static-files/:fileName"
+	deleteFiles   = "/static-files/delete"
+	assets        = "/assets"
+)
+
+const (
+	templateFolder = "templates/*"
+	assetsFolder   = "./assets"
+)
 
 func uploadFile(context *gin.Context) {
 	multipartForm, _ := context.MultipartForm()
 	files := multipartForm.File["files[]"]
 	for _, file := range files {
-		context.SaveUploadedFile(file, STATIC_FILES_PATH + "/" + file.Filename)
+		err := context.SaveUploadedFile(file, staticFilesPath+"/"+file.Filename)
+		if err != nil {
+			log.Println(err)
+		}
 	}
-	context.Redirect(http.StatusMovedPermanently, INDEX)
+	context.Redirect(http.StatusMovedPermanently, index)
 }
 
 func indexPage(context *gin.Context) {
-	files, err := ioutil.ReadDir(STATIC_FILES_PATH)
+	files, err := ioutil.ReadDir(staticFilesPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,38 +54,40 @@ func indexPage(context *gin.Context) {
 
 func downloadFile(context *gin.Context) {
 	fileName := context.Param("fileName")
-	context.File(STATIC_FILES_PATH+"/"+fileName)
+	context.File(staticFilesPath + "/" + fileName)
 }
 
 func deleteFile(context *gin.Context) {
 	fileName := context.PostForm("file")
-	err := os.Remove(STATIC_FILES_PATH+"/"+fileName)
+	err := os.Remove(staticFilesPath + "/" + fileName)
 	if err != nil {
-		log.Println("Failed to delete"+err.Error())
+		log.Println("Failed to delete" + err.Error())
 	}
-	context.Redirect(http.StatusMovedPermanently, INDEX)
+	context.Redirect(http.StatusMovedPermanently, index)
 }
 
 func redirectToIndexPage(context *gin.Context) {
-	context.Redirect(http.StatusMovedPermanently, INDEX)
+	context.Redirect(http.StatusMovedPermanently, index)
 }
 
 func main() {
-	
+
 	router := gin.Default()
 
 	router.MaxMultipartMemory = 8 << 25
 
-	router.LoadHTMLGlob("templates/*")
-	router.Static("/assets", "./assets")
+	router.LoadHTMLGlob(templateFolder)
+	router.Static(assets, assetsFolder)
 
-	authorized := router.Group("", gin.BasicAuth(gin.Accounts{USER_NAME: PASSWORD}))
+	authorized := router.Group("", gin.BasicAuth(gin.Accounts{userName: password}))
 
-	authorized.GET(HOME, redirectToIndexPage)
-	authorized.GET(INDEX, indexPage)
-	authorized.POST(UPLOAD_FILES, uploadFile)
-	authorized.GET(DOWNLOAD_FILES, downloadFile)
-	authorized.POST(DELETE_FILES, deleteFile)
+	authorized.GET(home, redirectToIndexPage)
+	authorized.GET(index, indexPage)
+	authorized.POST(uploadFiles, uploadFile)
+	authorized.GET(downloadFiles, downloadFile)
+	authorized.POST(deleteFiles, deleteFile)
 
-	router.Run()
+	if err := router.Run(); err != nil {
+		log.Println(err)
+	}
 }
