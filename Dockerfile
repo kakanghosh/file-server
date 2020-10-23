@@ -3,6 +3,7 @@ FROM golang:1.15-alpine as BUILD
 WORKDIR /go/src/github.com/kakanghosh/file-server
 
 COPY *.go .
+COPY app app/
 COPY *.mod .
 COPY *.sum .
 
